@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMEL Notes - ملاحظاتي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn.folder-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn.folder-btn:hover {
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .content-area {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 500px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .folder-list {
+            list-style: none;
+        }
+
+        .folder-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .folder-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .folder-item.active {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .folder-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .delete-folder {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notes-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .note-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .note-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .note-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .note-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .note-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .note-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h2 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .close {
+            color: white;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #ff4757;
+        }
+
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .file-preview img,
+        .file-preview video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .file-preview .file-info {
+            color: white;
+            font-size: 14px;
+        }
+
+        .remove-file {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .note-media {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .note-media img,
+        .note-media video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-media video {
+            width: 100%;
+        }
+
+        .search-filter-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .filters-container select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .tag:hover {
+            transform: scale(1.05);
+        }
+
+        .tag.active {
+            border-color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .tag.work { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); }
+        .tag.personal { background: linear-gradient(45deg, #4ecdc4, #44a08d); }
+        .tag.study { background: linear-gradient(45deg, #45b7d1, #96c93d); }
+        .tag.important { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .tag.idea { background: linear-gradient(45deg, #ffecd2, #fcb69f); }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .selected-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-tag {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .priority-high { background: #ff4757; }
+        .priority-medium { background: #ffa502; }
+        .priority-low { background: #2ed573; }
+
+        .note-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin: 10px 0;
+        }
+
+        .note-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .search-highlight {
+            background: yellow;
+            color: black;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="loginOverlay" style="position: fixed; inset: 0; background: linear-gradient(135deg, #667eea, #764ba2); z-index: 9999; display: flex; align-items: center; justify-content: center; font-family: sans-serif;">
+    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center; width: 90%; max-width: 400px;">
+        <h2 style="margin-bottom: 20px;">تسجيل الدخول</h2>
+        <input id="usernameInput" type="text" placeholder="اسم المستخدم" style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ccc;"><br>
+        <input id="passwordInput" type="password" placeholder="كلمة المرور" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #ccc;"><br>
+        <button onclick="validateLogin()" style="padding: 10px 25px; border: none; border-radius: 20px; background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; font-weight: bold; cursor: pointer;">دخول</button>
+        <p id="loginError" style="color: red; margin-top: 10px; display: none;">بيانات الدخول غير صحيحة</p>
+    </div>
+</div>
+
+<script>
+function validateLogin() {
+    const user = document.getElementById('usernameInput').value.trim();
+    const pass = document.getElementById('passwordInput').value.trim();
+
+    if (user === 'amjed' && pass === '075324654') {
+        document.getElementById('loginOverlay').style.display = 'none';
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
+}
+</script>
+
+    <div class="container">
+        <div class="header">
+            <h1>PMEL Notes</h1>
+            <p>نظم ملاحظاتك بسهولة وأناقة</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn folder-btn" onclick="openFolderModal()">إنشاء مجلد جديد</button>
+            <button class="btn" onclick="openNoteModal()">إضافة ملاحظة جديدة</button>
+        </div>
+
+        <div class="search-filter-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="البحث في الملاحظات..." onkeyup="performSearch()">
+                <button class="search-btn" onclick="performSearch()">🔍</button>
+            </div>
+            
+            <div class="filters-container">
+                <select id="sortFilter" onchange="applySorting()">
+                    <option value="date-desc">الأحدث أولاً</option>
+                    <option value="date-asc">الأقدم أولاً</option>
+                    <option value="title-asc">العنوان (أ-ي)</option>
+                    <option value="title-desc">العنوان (ي-أ)</option>
+                    <option value="priority-desc">الأهمية (عالية أولاً)</option>
+                    <option value="priority-asc">الأهمية (منخفضة أولاً)</option>
+                </select>
+                
+                <select id="typeFilter" onchange="applyFilters()">
+                    <option value="all">جميع الأنواع</option>
+                    <option value="text">نص فقط</option>
+                    <option value="image">مع صور</option>
+                    <option value="video">مع فيديو</option>
+                </select>
+                
+                <select id="priorityFilter" onchange="applyFilters()">
+                    <option value="all">جميع الأولويات</option>
+                    <option value="high">عالية الأهمية</option>
+                    <option value="medium">متوسطة الأهمية</option>
+                    <option value="low">منخفضة الأهمية</option>
+                </select>
+                
+                <button class="filter-btn" onclick="clearFilters()">مسح الفلاتر</button>
+            </div>
+            
+            <div class="tags-filter">
+                <div id="tagsFilter" class="tags-container"></div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="sidebar">
+                <h3>المجلدات</h3>
+                <ul class="folder-list" id="folderList">
+                    <li class="folder-item active" onclick="selectFolder('all')">
+                        <span class="folder-name">جميع الملاحظات</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="notes-area">
+                <div id="notesContainer" class="notes-grid">
+                    <div class="empty-state">
+                        <h3>لا توجد ملاحظات حتى الآن</h3>
+                        <p>ابدأ بإنشاء أول ملاحظة لك!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for creating folders -->
+    <div id="folderModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFolderModal()">&times;</span>
+            <h2>إنشاء مجلد جديد</h2>
+            <div class="form-group">
+                <label>اسم المجلد:</label>
+                <input type="text" id="folderName" placeholder="أدخل اسم المجلد">
+            </div>
+            <div class="modal-actions">
+                <button class="btn folder-btn" onclick="createFolder()">إنشاء المجلد</button>
+                <button class="btn" onclick="closeFolderModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for creating/editing notes -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNoteModal()">&times;</span>
+            <h2 id="noteModalTitle">إضافة ملاحظة جديدة</h2>
+            <div class="form-group">
+                <label>عنوان الملاحظة:</label>
+                <input type="text" id="noteTitle" placeholder="أدخل عنوان الملاحظة">
+            </div>
+            <div class="form-group">
+                <label>المجلد:</label>
+                <select id="noteFolder">
+                    <option value="">اختر المجلد</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الأولوية:</label>
+                <select id="notePriority">
+                    <option value="medium">متوسطة</option>
+                    <option value="high">عالية</option>
+                    <option value="low">منخفضة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>العلامات (اختياري):</label>
+                <input type="text" id="noteTags" placeholder="مثال: عمل، مهم، فكرة (فصل بفواصل)">
+                <div class="tags-input-container">
+                    <div id="selectedTags" class="selected-tags"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>محتوى الملاحظة:</label>
+                <textarea id="noteContent" placeholder="اكتب محتوى الملاحظة هنا..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>إرفاق صورة أو فيديو (اختياري):</label>
+                <input type="file" id="noteFile" accept="image/*,video/*" onchange="handleFileUpload(event)">
+                <div id="filePreview" class="file-preview"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="saveNote()" id="saveNoteBtn">حفظ الملاحظة</button>
+                <button class="btn" onclick="closeNoteModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let folders = [];
+        let notes = [];
+        let currentFolder = 'all';
+        let editingNoteId = null;
+        let currentFileData = null;
+        let currentFileName = null;
+        let allTags = new Set();
+        let activeFilters = {
+            search: '',
+            sort: 'date-desc',
+            type: 'all',
+            priority: 'all',
+            tags: []
+        };
+
+        // Load data from memory
+        function loadData() {
+            // Initialize with some sample data if empty
+            if (folders.length === 0) {
+                folders = [
+                    { id: 1, name: 'العمل' },
+                    { id: 2, name: 'الدراسة' },
+                    { id: 3, name: 'شخصي' }
+                ];
+            }
+            
+            if (notes.length === 0) {
+                notes = [];
+                
+                // استخراج جميع العلامات
+                notes.forEach(note => {
+                    if (note.tags) {
+                        note.tags.forEach(tag => allTags.add(tag));
+                    }
+                });
+            }
+            
+            updateFolderList();
+            updateTagsFilter();
+            displayNotes();
+        }
+
+        // Update folder list
+        function updateFolderList() {
+            const folderList = document.getElementById('folderList');
+            const noteFolder = document.getElementById('noteFolder');
+            
+            // Clear existing folders (except "All Notes")
+            const allNotesItem = folderList.querySelector('.folder-item');
+            folderList.innerHTML = '';
+            folderList.appendChild(allNotesItem);
+            
+            // Clear note folder select
+            noteFolder.innerHTML = '<option value="">اختر المجلد</option>';
+            
+            folders.forEach(folder => {
+                // Add to sidebar
+                const li = document.createElement('li');
+                li.className = 'folder-item';
+                li.onclick = () => selectFolder(folder.name);
+                li.innerHTML = `
+                    <span class="folder-name">${folder.name}</span>
+                    <button class="delete-folder" onclick="deleteFolder(${folder.id}, event)">×</button>
+                `;
+                folderList.appendChild(li);
+                
+                // Add to select
+                const option = document.createElement('option');
+                option.value = folder.name;
+                option.textContent = folder.name;
+                noteFolder.appendChild(option);
+            });
+        }
+
+        // Update tags filter
+        function updateTagsFilter() {
+            const tagsFilter = document.getElementById('tagsFilter');
+            tagsFilter.innerHTML = '';
+            
+            if (allTags.size > 0) {
+                allTags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = `tag ${getTagClass(tag)}`;
+                    tagElement.textContent = tag;
+                    tagElement.onclick = () => toggleTagFilter(tag, tagElement);
+                    tagsFilter.appendChild(tagElement);
+                });
+            }
+        }
+
+        // Get tag class based on tag name
+        function getTagClass(tag) {
+            const tagLower = tag.toLowerCase();
+            if (tagLower.includes('عمل') || tagLower.includes('work')) return 'work';
+            if (tagLower.includes('شخصي') || tagLower.includes('personal')) return 'personal';
+            if (tagLower.includes('دراسة') || tagLower.includes('study')) return 'study';
+            if (tagLower.includes('مهم') || tagLower.includes('important')) return 'important';
+            if (tagLower.includes('فكرة') || tagLower.includes('idea')) return 'idea';
+            return '';
+        }
+
+        // Toggle tag filter
+        function toggleTagFilter(tag, element) {
+            const index = activeFilters.tags.indexOf(tag);
+            if (index > -1) {
+                activeFilters.tags.splice(index, 1);
+                element.classList.remove('active');
+            } else {
+                activeFilters.tags.push(tag);
+                element.classList.add('active');
+            }
+            applyFilters();
+        }
+        function selectFolder(folderName) {
+            currentFolder = folderName;
+            
+            // Update active folder
+            document.querySelectorAll('.folder-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.target.closest('.folder-item').classList.add('active');
+            
+            displayNotes();
+        }
+
+        // Display notes with filtering and sorting
+        function displayNotes() {
+            const notesContainer = document.getElementById('notesContainer');
+            let filteredNotes = [...notes];
+            
+            // Apply folder filter
+            if (currentFolder !== 'all') {
+                filteredNotes = filteredNotes.filter(note => note.folder === currentFolder);
+            }
+            
+            // Apply search filter
+            if (activeFilters.search) {
+                const searchTerm = activeFilters.search.toLowerCase();
+                filteredNotes = filteredNotes.filter(note => 
+                    note.title.toLowerCase().includes(searchTerm) ||
+                    note.content.toLowerCase().includes(searchTerm) ||
+                    (note.tags && note.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+                );
+            }
+            
+            // Apply type filter
+            if (activeFilters.type !== 'all') {
+                filteredNotes = filteredNotes.filter(note => {
+                    if (activeFilters.type === 'text') return !note.fileData;
+                    if (activeFilters.type === 'image') return note.fileType === 'image';
+                    if (activeFilters.type === 'video') return note.fileType === 'video';
+                    return true;
+                });
+            }
+            
+            // Apply priority filter
+            if (activeFilters.priority !== 'all') {
+                filteredNotes = filteredNotes.filter(note => note.priority === activeFilters.priority);
+            }
+            
+            // Apply tags filter
+            if (activeFilters.tags.length > 0) {
+                filteredNotes = filteredNotes.filter(note => 
+                    note.tags && activeFilters.tags.some(tag => note.tags.includes(tag))
+                );
+            }
+            
+            // Apply sorting
+            filteredNotes.sort((a, b) => {
+                switch (activeFilters.sort) {
+                    case 'date-desc':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'date-asc':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'title-asc':
+                        return a.title.localeCompare(b.title, 'ar');
+                    case 'title-desc':
+                        return b.title.localeCompare(a.title, 'ar');
+                    case 'priority-desc':
+                        const priorityOrder = { high: 3, medium: 2, low: 1 };
+                        return priorityOrder[b.priority] - priorityOrder[a.priority];
+                    case 'priority-asc':
+                        const priorityOrderAsc = { high: 1, medium: 2, low: 3 };
+                        return priorityOrderAsc[a.priority] - priorityOrderAsc[b.priority];
+                    default:
+                        return 0;
+                }
+            });
+            
+            if (filteredNotes.length === 0) {
+                notesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>لا توجد ملاحظات مطابقة للبحث</h3>
+                        <p>جرب تغيير معايير البحث أو الفلترة</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            notesContainer.innerHTML = filteredNotes.map(note => {
+                const priorityClass = `priority-${note.priority}`;
+                const priorityText = note.priority === 'high' ? 'عالية' : 
+                                   note.priority === 'medium' ? 'متوسطة' : 'منخفضة';
+                
+                let highlightedTitle = note.title;
+                let highlightedContent = note.content;
+                
+                if (activeFilters.search) {
+                    const regex = new RegExp(`(${activeFilters.search})`, 'gi');
+                    highlightedTitle = highlightedTitle.replace(regex, '<span class="search-highlight">$1</span>');
+                    highlightedContent = highlightedContent.replace(regex, '<span class="search-highlight">$1</span>');
+                }
+                
+                return `
+                    <div class="note-card">
+                        <div class="note-header">
+                            <div class="note-title">${highlightedTitle}</div>
+                            <div class="note-date">${note.date}</div>
+                        </div>
+                        <div class="priority-badge ${priorityClass}">أولوية ${priorityText}</div>
+                        <div class="note-content">${highlightedContent}</div>
+                        ${note.tags && note.tags.length > 0 ? `
+                            <div class="note-tags">
+                                ${note.tags.map(tag => `<span class="note-tag ${getTagClass(tag)}">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        ${note.fileData ? `
+                            <div class="note-media">
+                                ${note.fileType === 'image' ? 
+                                    `<img src="${note.fileData}" alt="مرفق">` : 
+                                    `<video controls src="${note.fileData}"></video>`
+                                }
+                                <div class="media-filename">${note.fileName}</div>
+                            </div>
+                        ` : ''}
+                        <div class="note-actions">
+                            <button class="note-btn edit-btn" onclick="editNote(${note.id})">تعديل</button>
+                            <button class="note-btn delete-btn" onclick="deleteNote(${note.id})">حذف</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Open folder modal
+        function openFolderModal() {
+            document.getElementById('folderModal').style.display = 'block';
+            document.getElementById('folderName').value = '';
+        }
+
+        // Close folder modal
+        function closeFolderModal() {
+            document.getElementById('folderModal').style.display = 'none';
+        }
+
+        // Create folder
+        function createFolder() {
+            const folderName = document.getElementById('folderName').value.trim();
+            
+            if (!folderName) {
+                alert('يرجى إدخال اسم المجلد');
+                return;
+            }
+            
+            if (folders.some(f => f.name === folderName)) {
+                alert('يوجد مجلد بهذا الاسم بالفعل');
+                return;
+            }
+            
+            const newFolder = {
+                id: Date.now(),
+                name: folderName
+            };
+            
+            folders.push(newFolder);
+            updateFolderList();
+            closeFolderModal();
+        }
+
+        // Delete folder
+        function deleteFolder(folderId, event) {
+            event.stopPropagation();
+            
+            if (confirm('هل أنت متأكد من حذف هذا المجلد؟ سيتم حذف جميع الملاحظات بداخله.')) {
+                const folder = folders.find(f => f.id === folderId);
+                if (folder) {
+                    notes = notes.filter(note => note.folder !== folder.name);
+                    folders = folders.filter(f => f.id !== folderId);
+                    updateFolderList();
+                    displayNotes();
+                }
+            }
+        }
+
+        // Search functionality
+        function performSearch() {
+            activeFilters.search = document.getElementById('searchInput').value.trim();
+            displayNotes();
+        }
+
+        // Apply sorting
+        function applySorting() {
+            activeFilters.sort = document.getElementById('sortFilter').value;
+            displayNotes();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            activeFilters.type = document.getElementById('typeFilter').value;
+            activeFilters.priority = document.getElementById('priorityFilter').value;
+            displayNotes();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('sortFilter').value = 'date-desc';
+            document.getElementById('typeFilter').value = 'all';
+            document.getElementById('priorityFilter').value = 'all';
+            
+            activeFilters = {
+                search: '',
+                sort: 'date-desc',
+                type: 'all',
+                priority: 'all',
+                tags: []
+            };
+            
+            // Clear active tags
+            document.querySelectorAll('.tag.active').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            
+            displayNotes();
+        }
+
+        // Process tags input
+        function processTags(tagsString) {
+            if (!tagsString) return [];
+            return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        }
+
+        // Update selected tags display
+        function updateSelectedTags(tags) {
+            const container = document.getElementById('selectedTags');
+            container.innerHTML = tags.map(tag => `
+                <span class="selected-tag ${getTagClass(tag)}">
+                    ${tag}
+                    <button class="remove-tag" onclick="removeSelectedTag('${tag}')">×</button>
+                </span>
+            `).join('');
+        }
+
+        // Remove selected tag
+        function removeSelectedTag(tagToRemove) {
+            const input = document.getElementById('noteTags');
+            const currentTags = processTags(input.value);
+            const updatedTags = currentTags.filter(tag => tag !== tagToRemove);
+            input.value = updatedTags.join(', ');
+            updateSelectedTags(updatedTags);
+        }
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('filePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+                
+                reader.onload = function(e) {
+                    currentFileData = e.target.result;
+                    currentFileName = file.name;
+                    
+                    if (fileType === 'image') {
+                        preview.innerHTML = `
+                            <img src="${currentFileData}" alt="معاينة الصورة">
+                            <div class="file-info">${file.name}</div>
+                            <button class="remove-file" onclick="removeFile()">إزالة الملف</button>
+                        `;
+                    } else {
+                        preview.innerHTML = `
+                            <video src="${currentFileData}" controls></video>
+                            <div class="file-info">${file.name}</div>
+                            <button class="remove-file" onclick="removeFile()">إزالة الملف</button>
+                        `;
+                    }
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove uploaded file
+        function removeFile() {
+            currentFileData = null;
+            currentFileName = null;
+            document.getElementById('noteFile').value = '';
+            document.getElementById('filePreview').innerHTML = '';
+        }
+        function openNoteModal() {
+            document.getElementById('noteModal').style.display = 'block';
+            document.getElementById('noteModalTitle').textContent = 'إضافة ملاحظة جديدة';
+            document.getElementById('saveNoteBtn').textContent = 'حفظ الملاحظة';
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteFolder').value = '';
+            editingNoteId = null;
+        }
+
+        // Close note modal
+        function closeNoteModal() {
+            document.getElementById('noteModal').style.display = 'none';
+        }
+
+        // Save note
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const folder = document.getElementById('noteFolder').value;
+            
+            if (!title || !content) {
+                alert('يرجى إدخال عنوان ومحتوى الملاحظة');
+                return;
+            }
+            
+            if (editingNoteId) {
+                // Edit existing note
+                const noteIndex = notes.findIndex(n => n.id === editingNoteId);
+                if (noteIndex !== -1) {
+                    notes[noteIndex] = {
+                        ...notes[noteIndex],
+                        title,
+                        content,
+                        folder: folder || 'بدون مجلد',
+                        fileData: currentFileData || notes[noteIndex].fileData,
+                        fileName: currentFileName || notes[noteIndex].fileName,
+                        fileType: currentFileData ? (currentFileData.startsWith('data:image/') ? 'image' : 'video') : notes[noteIndex].fileType
+                    };
+                }
+            } else {
+                // Create new note
+                const newNote = {
+                    id: Date.now(),
+                    title,
+                    content,
+                    folder: folder || 'بدون مجلد',
+                    date: new Date().toLocaleDateString('ar-SA'),
+                    fileData: currentFileData,
+                    fileName: currentFileName,
+                    fileType: currentFileData ? (currentFileData.startsWith('data:image/') ? 'image' : 'video') : null
+                };
+                notes.push(newNote);
+            }
+            
+            displayNotes();
+            closeNoteModal();
+        }
+
+        // Edit note
+        function editNote(noteId) {
+            const note = notes.find(n => n.id === noteId);
+            if (note) {
+                document.getElementById('noteModal').style.display = 'block';
+                document.getElementById('noteModalTitle').textContent = 'تعديل الملاحظة';
+                document.getElementById('saveNoteBtn').textContent = 'حفظ التعديلات';
+                document.getElementById('noteTitle').value = note.title;
+                document.getElementById('noteContent').value = note.content;
+                document.getElementById('noteFolder').value = note.folder;
+                
+                currentFileData = note.fileData;
+                currentFileName = note.fileName;
+                
+                const preview = document.getElementById('filePreview');
+                if (note.fileData) {
+                    if (note.fileType === 'image') {
+                        preview.innerHTML = `
+                            <img src="${note.fileData}" alt="معاينة الصورة">
+                            <div class="file-info">${note.fileName}</div>
+                            <button class="remove-file" onclick="removeFile()">إزالة الملف</button>
+                        `;
+                    } else {
+                        preview.innerHTML = `
+                            <video src="${note.fileData}" controls></video>
+                            <div class="file-info">${note.fileName}</div>
+                            <button class="remove-file" onclick="removeFile()">إزالة الملف</button>
+                        `;
+                    }
+                } else {
+                    preview.innerHTML = '';
+                }
+                
+                editingNoteId = noteId;
+            }
+        }
+
+        // Delete note
+        function deleteNote(noteId) {
+            if (confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+                notes = notes.filter(n => n.id !== noteId);
+                displayNotes();
+            }
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const folderModal = document.getElementById('folderModal');
+            const noteModal = document.getElementById('noteModal');
+            
+            if (event.target === folderModal) {
+                closeFolderModal();
+            }
+            if (event.target === noteModal) {
+                closeNoteModal();
+            }
+        }
+
+        // Initialize the app
+        loadData();
+    </script>
+</body>
+</html>
