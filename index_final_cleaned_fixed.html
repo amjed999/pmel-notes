@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>نظام الملاحظات</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal input, .modal textarea {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #loginOverlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #loginBox {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        #loginBox input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        #loginBox button {
+            padding: 10px 20px;
+            background: #44a08d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        #logoutBtn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            padding: 8px 15px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- تسجيل الدخول -->
+<div id="loginOverlay">
+    <div id="loginBox">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="usernameInput" placeholder="اسم المستخدم">
+        <input type="password" id="passwordInput" placeholder="كلمة المرور">
+        <label style="font-size: 14px;">
+            <input type="checkbox" id="rememberMe"> تذكرني
+        </label><br><br>
+        <button onclick="validateLogin()">دخول</button>
+        <p id="loginError" style="color:red; display:none;">بيانات الدخول غير صحيحة</p>
+    </div>
+</div>
+
+<!-- زر تسجيل الخروج -->
+<button id="logoutBtn" onclick="logout()">تسجيل الخروج</button>
+
+<!-- مثال على نافذة ملاحظة -->
+<div class="modal">
+    <div class="modal-content">
+        <h3>ملاحظة جديدة</h3>
+        <input type="text" placeholder="عنوان">
+        <textarea placeholder="تفاصيل..."></textarea>
+        <button>حفظ</button>
+    </div>
+</div>
+
+<script>
+const correctUser = "amjed";
+const correctPass = "075324654";
+
+window.onload = function () {
+    if (localStorage.getItem("loggedIn") === "true") {
+        document.getElementById("loginOverlay").style.display = "none";
+    }
+}
+
+function validateLogin() {
+    const user = document.getElementById("usernameInput").value.trim();
+    const pass = document.getElementById("passwordInput").value.trim();
+    const remember = document.getElementById("rememberMe").checked;
+
+    if (user === correctUser && pass === correctPass) {
+        document.getElementById("loginOverlay").style.display = "none";
+        if (remember) {
+            localStorage.setItem("loggedIn", "true");
+        }
+    } else {
+        document.getElementById("loginError").style.display = "block";
+    }
+}
+
+function logout() {
+    localStorage.removeItem("loggedIn");
+    location.reload();
+}
+</script>
+
+</body>
+</html>
